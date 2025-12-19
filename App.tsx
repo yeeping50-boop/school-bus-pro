@@ -28,9 +28,9 @@ import {
   CheckCircle,
   Crown
 } from 'lucide-react';
-import { INITIAL_STUDENTS } from './constants';
-import { Student, RouteType, DirectionType, AppTab, ChatMessage } from './types';
-import { getDriverAssistantResponse } from './services/geminiService';
+import { INITIAL_STUDENTS } from './constants.tsx';
+import { Student, RouteType, DirectionType, AppTab, ChatMessage } from './types.ts';
+import { getDriverAssistantResponse } from './services/geminiService.ts';
 
 const STORAGE_KEY = 'school_bus_pro_data';
 const PRO_KEY = 'school_bus_pro_is_premium';
@@ -99,20 +99,14 @@ const App: React.FC = () => {
   const currentStudents = useMemo(() => routeState[selectedRoute][selectedDirection], [routeState, selectedRoute, selectedDirection]);
 
   // Payment Logic Simulation
-  // In a real Play Store app, this function would call the Google Play Billing Plugin
   const handlePurchase = async () => {
     setIsPurchasing(true);
-    
-    // Simulate connection to Google Play Billing Service
     await new Promise(resolve => setTimeout(resolve, 2500));
-    
-    // In a real app, you'd check for a success token from Google here
     setIsPro(true);
     setIsPurchasing(false);
     alert("Purchase Successful! Welcome to School Bus Pro.");
   };
 
-  // Handlers
   const handleSaveStudent = (s: Student) => {
     setRouteState(prev => {
       const newState = { ...prev };
@@ -173,7 +167,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col text-slate-900 overflow-hidden font-sans">
-      {/* Header */}
       <header className="bg-yellow-400 px-6 pt-12 pb-6 border-b-4 border-slate-900 shadow-xl z-20 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -205,7 +198,6 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Content Area */}
       <main className="flex-1 overflow-y-auto pb-32">
         {isEditing ? (
           <div className="p-6">
@@ -249,22 +241,6 @@ const App: React.FC = () => {
                   {currentStudents.map((s, idx) => (
                     <div 
                       key={s.id} 
-                      draggable
-                      onDragStart={() => setDraggedIdx(idx)}
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        if (draggedIdx === null || draggedIdx === idx) return;
-                        setRouteState(prev => {
-                          const newState = { ...prev };
-                          const list = [...prev[selectedRoute][selectedDirection]];
-                          const item = list.splice(draggedIdx, 1)[0];
-                          list.splice(idx, 0, item);
-                          newState[selectedRoute][selectedDirection] = list;
-                          return newState;
-                        });
-                        setDraggedIdx(idx);
-                      }}
-                      onDragEnd={() => setDraggedIdx(null)}
                       onClick={() => { setSelectedStudent(s); setIsEditing(true); }}
                       className={`bg-white p-5 rounded-[2rem] border-2 transition-all flex items-center gap-4 group active:scale-[0.98] ${activeNavId === s.id ? 'border-yellow-400 ring-4 ring-yellow-50 shadow-lg' : 'border-slate-100 shadow-md'}`}
                     >
@@ -284,7 +260,6 @@ const App: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Floating Action Button for GPS */}
                 <div className="fixed bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
                   <div className="max-w-3xl mx-auto">
                     <button 
@@ -345,8 +320,6 @@ const App: React.FC = () => {
 
             {activeTab === 'settings' && (
               <div className="p-6 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                
-                {/* Pro Upsell / Welcome Card */}
                 {!isPro ? (
                   <div className="bg-slate-900 rounded-[3rem] p-8 text-white relative overflow-hidden shadow-2xl">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
@@ -411,17 +384,6 @@ const App: React.FC = () => {
                     </div>
                     {isPro ? <ChevronRight size={20} className="text-slate-200" /> : <div className="text-[10px] font-black text-yellow-500 uppercase">Upgrade</div>}
                   </button>
-
-                  <button className="w-full flex items-center justify-between p-5 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors group opacity-50">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-white rounded-xl shadow-sm text-slate-500"><ExternalLink size={22} /></div>
-                      <div className="text-left">
-                        <p className="font-bold text-slate-900">Import Route</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase">Sync from dispatch</p>
-                      </div>
-                    </div>
-                    <Sparkles size={16} className="text-yellow-500" />
-                  </button>
                 </div>
 
                 <div className="text-center py-8">
@@ -435,7 +397,6 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Navigation Bar */}
       {!isEditing && (
         <nav className="fixed bottom-8 left-6 right-6 h-20 bg-slate-900 rounded-[2.5rem] shadow-2xl z-50 flex items-center justify-around px-4 border border-white/10">
           <NavItem active={activeTab === 'list'} icon={<List size={26} />} label="Stops" onClick={() => setActiveTab('list')} />

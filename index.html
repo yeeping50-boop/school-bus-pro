@@ -17,6 +17,33 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
+        /* Loading Spinner */
+        #app-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #facc15;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(15, 23, 42, 0.1);
+            border-left-color: #0f172a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 <script type="importmap">
 {
@@ -30,28 +57,38 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <div id="app-loader">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem; font-weight: 900; color: #0f172a; text-transform: uppercase; font-size: 12px; letter-spacing: 0.1em;">Loading BusPro...</p>
+        </div>
+    </div>
+
+    <!-- Main Entry Point -->
+    <script type="module" src="./index.tsx"></script>
+
     <script>
-      // Optimized Service Worker registration to handle playground sandbox restrictions
+      /**
+       * PWA Service Worker Registration
+       */
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Only attempt registration if we aren't in the restricted preview domain
-          const isPlayground = window.location.hostname.includes('usercontent.goog') || 
-                               window.location.hostname.includes('ai.studio');
-          
-          if (!isPlayground) {
+          const hostname = window.location.hostname;
+          const isDevelopmentSandbox = 
+            hostname.includes('usercontent.goog') || 
+            hostname.includes('ai.studio') || 
+            hostname.includes('localhost') ||
+            hostname === '';
+
+          if (!isDevelopmentSandbox) {
             navigator.serviceWorker.register('./sw.js')
-              .then(reg => console.log('SW Registered'))
-              .catch(err => console.warn('SW registration skipped in development:', err.message));
-          } else {
-            console.log('Service Worker skipped: Preview environment detected.');
+              .then(reg => console.log('✅ Service Worker Active'))
+              .catch(err => console.error('❌ PWA Error:', err));
           }
         });
       }
     </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
