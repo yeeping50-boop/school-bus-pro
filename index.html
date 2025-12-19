@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#0F172A">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <!-- Scripts for Browser-side Transpilation -->
+    <!-- Babel Transpiler for Mobile Compatibility -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
@@ -18,9 +18,9 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
-            -webkit-tap-highlight-color: transparent;
             margin: 0;
             padding: 0;
+            overflow: hidden;
         }
         #app-loader {
             display: flex;
@@ -29,6 +29,7 @@
             justify-content: center;
             height: 100vh;
             background: #facc15;
+            transition: opacity 0.5s ease;
         }
         .spinner {
             width: 40px;
@@ -41,17 +42,28 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        #error-display {
+        #error-console {
             display: none;
-            padding: 20px;
-            background: #fee2e2;
-            color: #991b1b;
-            font-family: monospace;
-            white-space: pre-wrap;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 9999;
-            overflow: auto;
+            inset: 0;
+            background: #1e293b;
+            color: #38bdf8;
+            padding: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 10000;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        #debug-trigger {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #0f172a;
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
         }
     </style>
 
@@ -73,14 +85,37 @@
         <div id="app-loader">
             <div class="spinner"></div>
             <p style="margin-top: 1rem; font-weight: 900; color: #0f172a; text-transform: uppercase; font-size: 12px; letter-spacing: 0.1em;">Starting BusPro...</p>
+            <button id="debug-trigger" onclick="document.getElementById('error-console').style.display='block'">View Error Log</button>
         </div>
     </div>
-    <div id="error-display"></div>
 
-    <!-- 
-      We use type="text/babel" so the Babel script above 
-      knows to transpile this file before running it.
-    -->
+    <div id="error-console">
+        <button onclick="this.parentElement.style.display='none'" style="background:#ef4444; color:white; padding:5px 10px; border-radius:4px; margin-bottom:10px;">Close Logs</button>
+        <div id="log-content">--- APP LOG START ---</div>
+    </div>
+
+    <script>
+        // Emergency Debugger for Mobile
+        const logContent = document.getElementById('log-content');
+        function log(msg, type = 'INFO') {
+            const entry = `\n[${new Date().toLocaleTimeString()}] [${type}] ${msg}`;
+            logContent.innerText += entry;
+            console.log(entry);
+        }
+
+        window.onerror = (m, u, l, c, e) => log(`${m} at ${u}:${l}`, 'ERROR');
+        window.onunhandledrejection = (e) => log(`Promise Rejected: ${e.reason}`, 'ERROR');
+
+        // If app hasn't loaded in 8 seconds, show the debug trigger
+        setTimeout(() => {
+            const loader = document.getElementById('app-loader');
+            if (loader) document.getElementById('debug-trigger').style.display = 'block';
+        }, 8000);
+
+        log("System: Pre-initialization check...");
+    </script>
+
+    <!-- Transpiled Module Loading -->
     <script 
       type="text/babel" 
       data-type="module" 
@@ -89,19 +124,25 @@
     </script>
 
     <script>
-      // Global error handler to help debug the APK
-      window.onerror = function(msg, url, lineNo, columnNo, error) {
-        const display = document.getElementById('error-display');
-        display.style.display = 'block';
-        display.innerHTML += `\nError: ${msg}\nLine: ${lineNo}\nFile: ${url}\n`;
-        return false;
-      };
-
+      // Service Worker with Origin Safety Fix
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          const isDev = window.location.hostname.includes('studio') || window.location.hostname.includes('localhost');
-          if (!isDev) {
-            navigator.serviceWorker.register('./sw.js').catch(console.error);
+          try {
+            const currentOrigin = window.location.origin;
+            const swPath = new URL('./sw.js', window.location.href).href;
+            const swOrigin = new URL(swPath).origin;
+
+            log(`SW: Checking origin match... (Page: ${currentOrigin} vs SW: ${swOrigin})`);
+
+            if (currentOrigin === swOrigin) {
+              navigator.serviceWorker.register(swPath)
+                .then(() => log("SW: Registration Successful"))
+                .catch(err => log("SW: Registration Failed: " + err.message, "WARN"));
+            } else {
+              log("SW: Origin Mismatch detected. Skipping registration to prevent browser error.", "INFO");
+            }
+          } catch (e) {
+            log("SW: Registration logic error: " + e.message, "ERROR");
           }
         });
       }

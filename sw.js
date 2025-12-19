@@ -1,19 +1,8 @@
 
-const CACHE_NAME = 'bus-pro-debug-v1';
-
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
-});
-
-// Network-first strategy for debugging: always try to get the newest file first
+// ultra-minimal service worker to avoid origin issues
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', () => self.clients.claim());
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
-  );
+  // Pass through all requests to network
+  event.respondWith(fetch(event.request));
 });

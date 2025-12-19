@@ -3,29 +3,26 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 
-console.log("BusPro: Initializing Application...");
+// Use the global log function if available
+const debugLog = (window as any).log || console.log;
+
+debugLog("BusPro: Script execution started.");
 
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  const msg = "Critical Error: Could not find root element. The HTML might be corrupted.";
-  console.error(msg);
-  document.body.innerHTML = `<div style="padding:20px; color:red;">${msg}</div>`;
+  debugLog("BusPro: Root element missing!", "ERROR");
 } else {
   try {
+    debugLog("BusPro: Mounting React components...");
     const root = ReactDOM.createRoot(rootElement);
     root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
     );
-    console.log("BusPro: Render successful.");
+    debugLog("BusPro: React render triggered.");
   } catch (err) {
-    console.error("BusPro: Render failed", err);
-    const errorDisplay = document.getElementById('error-display');
-    if (errorDisplay) {
-        errorDisplay.style.display = 'block';
-        errorDisplay.innerText = "Startup Error: " + err.message + "\n" + err.stack;
-    }
+    debugLog("BusPro: Crash during mount: " + err.message, "ERROR");
   }
 }
