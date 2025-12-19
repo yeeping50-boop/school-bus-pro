@@ -1,0 +1,19 @@
+
+{
+  "name": "School Bus Pro",
+  "short_name": "BusPro",
+  "description": "Professional School Bus Route Management",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FACC15",
+  "theme_color": "#0F172A",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3429/3429151.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

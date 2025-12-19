@@ -1,0 +1,7 @@
+{
+  "name": "School Bus Pro - Private Driver Assistant",
+  "description": "A high-performance, privacy-focused management tool for professional school bus drivers. Local data storage and AI-powered route assistance.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
