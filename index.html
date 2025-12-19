@@ -22,7 +22,6 @@
             padding: 0;
             overflow: hidden;
         }
-        /* Loader is now outside #root */
         #app-loader {
             position: fixed;
             inset: 0;
@@ -75,14 +74,12 @@
 <link rel="stylesheet" href="/index.css">
 </head>
 <body>
-    <!-- The Loader stays until index.tsx tells it to hide -->
     <div id="app-loader">
         <div class="spinner"></div>
-        <p style="margin-top: 1rem; font-weight: 900; color: #0f172a; text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em;">BusPro v1.3 Loading...</p>
+        <p style="margin-top: 1rem; font-weight: 900; color: #0f172a; text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em;">BusPro v1.4 Starting...</p>
         <button id="debug-trigger" onclick="const ec = document.getElementById('error-console'); if(ec) ec.style.display='block'" style="display:none; margin-top: 20px; padding: 10px; background: #0f172a; color: white; border-radius: 8px;">Check Error Logs</button>
     </div>
 
-    <!-- The actual app mounts here -->
     <div id="root"></div>
 
     <div id="error-console">
@@ -99,14 +96,13 @@
             console.log(entry);
         }
 
-        // Global function to remove the loading screen
         window.hideLoader = function() {
             log("System: Hiding loader...");
             const loader = document.getElementById('app-loader');
-            if (loader) {
+            if (loader && loader.style) {
                 loader.style.opacity = '0';
                 loader.style.visibility = 'hidden';
-                setTimeout(() => loader.remove(), 500);
+                setTimeout(() => { if(loader) loader.remove(); }, 500);
             }
         };
 
@@ -115,15 +111,17 @@
 
         setTimeout(() => {
             const btn = document.getElementById('debug-trigger');
-            if (btn) btn.style.display = 'block';
+            if (btn && btn.style) btn.style.display = 'block';
         }, 5000);
 
         log("System: HTML Loaded, waiting for script...");
     </script>
 
+    <!-- CRITICAL: Added data-type="module" to enable ES6 imports in transpiled code -->
     <script 
       type="text/babel" 
       data-presets="react,typescript" 
+      data-type="module"
       src="./index.tsx"
       onload="log('System: index.tsx file successfully fetched.')"
       onerror="log('System: index.tsx file FAILED to load. Check path or MIME type.', 'ERROR')">

@@ -8,17 +8,30 @@ import {
   ShieldCheck, CreditCard, MessageSquare, List, Sparkles, Send, Loader2,
   CheckCircle, Crown, Bot, AlertTriangle, Clock, Users
 } from 'lucide-react';
-// Import shared types
-import { Student, ChatMessage } from './types';
+
+// --- CONSOLIDATED TYPES ---
+// We define these here because Babel Standalone cannot resolve relative local imports easily
+export interface Student {
+  id: string;
+  name: string;
+  address: string;
+  parentName: string;
+  parentContact: string;
+  notes: string;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'model';
+  text: string;
+}
+
+type RouteType = 'Morning Route' | 'Afternoon Route';
+type DirectionType = 'Go to School' | 'Back from School';
+type AppTab = 'list' | 'assistant' | 'settings';
 
 // --- INITIAL LOGGING ---
 const debugLog = (window as any).log || console.log;
 debugLog("App: Executing internal bundle...");
-
-// --- TYPES ---
-type RouteType = 'Morning Route' | 'Afternoon Route';
-type DirectionType = 'Go to School' | 'Back from School';
-type AppTab = 'list' | 'assistant' | 'settings';
 
 // --- CONSTANTS ---
 const INITIAL_STUDENTS: Student[] = [
