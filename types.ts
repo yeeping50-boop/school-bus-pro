@@ -1,4 +1,5 @@
 
+// Shared type definitions for the BusPro application
 export interface Student {
   id: string;
   name: string;
@@ -8,16 +9,11 @@ export interface Student {
   notes: string;
 }
 
-export type RouteType = 'Morning Route' | 'Afternoon Route';
-export type DirectionType = 'Go to School' | 'Back from School';
-export type AppTab = 'list' | 'assistant' | 'settings';
-
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
 }
 
-// Added Stop interface to support Route stops mapping
 export interface Stop {
   id: string;
   name: string;
@@ -25,7 +21,6 @@ export interface Stop {
   lng: number;
 }
 
-// Added Route interface for fleet-wide route management
 export interface Route {
   id: string;
   name: string;
@@ -33,12 +28,11 @@ export interface Route {
   stops: Stop[];
 }
 
-// Added Bus interface for real-time fleet status tracking
 export interface Bus {
   id: string;
   busNumber: string;
-  routeId: string;
   driverName: string;
+  routeId: string;
   status: 'On Route' | 'Delayed' | 'Completed' | 'Idle';
   currentCapacity: number;
   maxCapacity: number;
@@ -47,7 +41,6 @@ export interface Bus {
   nextStopId: string;
 }
 
-// Added Notification interface for system alerts and updates
 export interface Notification {
   id: string;
   type: 'alert' | 'success' | 'info';
